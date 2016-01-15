@@ -32,7 +32,7 @@ public class ChatHost{
     }
     
     public void broadcast(String message){
-        for (int i=0, i<outs.size(), i++){
+        for (int i=0; i<outs.size(); i++){
             outs.get(i).println(message);
         }
     }
@@ -70,15 +70,19 @@ public class ChatHost{
         private int id;
         private String lastChat, refName;
         
-        public Handler(Serversocket h, Socket c){
-            host = h;
-            client = c;
-            refName = "";
-            out = new PrintWriter(c.getOutputStream(), true);
-            outs.add(out);
-            in = new BufferedReader(new InputStreamReader(c.getInputStream()));
-            ins.add(in);
-            id = outs.size()-1;
+        public Handler(ServerSocket h, Socket c){
+            try{
+                host = h;
+                client = c;
+                refName = "";
+                out = new PrintWriter(c.getOutputStream(), true);
+                outs.add(out);
+                in = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                ins.add(in);
+                id = outs.size()-1;
+            } catch(Exception e){
+                //Do Nothing
+            }
         }
         
         public void setRefName(String name){
