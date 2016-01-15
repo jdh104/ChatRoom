@@ -1,4 +1,5 @@
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -12,8 +13,11 @@ public class ChatHost{
     private String myIp, myName;
     private ArrayList<Socket> clients;
     private ArrayList<PrintWriter> outs;
+    private ArrayList<BufferedReader> ins;
+    private ArrayList<String> chatQ;
     private ServerSocket host;
     private Connector connector;
+    private Socket mySocket;
     
     public ChatHost(int p){
         port = p;
@@ -37,6 +41,7 @@ public class ChatHost{
         
         private ServerSocket host;
         private ArrayList<Socket> clients;
+        private Socket lastCli;
         
         public Connector(ServerSocket s, ArrayList<Socket> c){
             host = s;
@@ -44,12 +49,14 @@ public class ChatHost{
         }
         
         public void run(){
-            try{
-                Socket cli = host.accept();
-                clients.add(cli);
-                new Handler(host,cli).start();
-            } catch(Exception e){
-                //Do Nothing
+            while (true){
+                try{
+                    lastCli = host.accept();
+                    clients.add(lastCli);
+                    new Handler(host,lastCli).start();
+                } catch(Exception e){
+                    //Do Nothing
+                }
             }
         }
     }
@@ -59,16 +66,29 @@ public class ChatHost{
         private ServerSocket host;
         private Socket client;
         private PrintWriter out;
+        private BufferedReader in;
+        private int id;
+        private String lastChat;
         
         public Handler(Serversocket h, Socket c){
             host = h;
             client = c;
             out = new PrintWriter(c.getOutputStream(), true);
             outs.add(out);
+            in = new BufferedReader(new InputStreamReader(c.getInputStream));
+            ins.add(in);
+            id = outs.size()-1;
         }
         
         public void run(){
-            
+            while (true){
+                try{
+                    lastChat = in.readLine();
+                    chatQ.add(lastChat);
+                } catch(Exception e){
+                    out.println("\tFrom: HOST, Error in sending message...");
+                }
+            }
         }
     }
 }
