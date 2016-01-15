@@ -89,11 +89,15 @@ public class ChatHost{
             refName = name;
         }
         
+        public void process(input){
+            chatQ.add(new Message(refName,lastChat));
+        }
+        
         public void run(){
             while (true){
                 try{
                     lastChat = in.readLine();
-                    chatQ.add(new Message(refName,lastChat));
+                    process(lastChat);
                 } catch(Exception e){
                     out.println("\tFrom: HOST, Error in sending message...");
                 }
