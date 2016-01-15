@@ -14,7 +14,7 @@ public class ChatHost{
     private ArrayList<Socket> clients;
     private ArrayList<PrintWriter> outs;
     private ArrayList<BufferedReader> ins;
-    private ArrayList<String> chatQ;
+    private ArrayList<Message> chatQ;
     private ServerSocket host;
     private Connector connector;
     private Socket mySocket;
@@ -68,23 +68,28 @@ public class ChatHost{
         private PrintWriter out;
         private BufferedReader in;
         private int id;
-        private String lastChat;
+        private String lastChat, refName;
         
         public Handler(Serversocket h, Socket c){
             host = h;
             client = c;
+            refName = "";
             out = new PrintWriter(c.getOutputStream(), true);
             outs.add(out);
-            in = new BufferedReader(new InputStreamReader(c.getInputStream));
+            in = new BufferedReader(new InputStreamReader(c.getInputStream()));
             ins.add(in);
             id = outs.size()-1;
+        }
+        
+        public void setRefName(String name){
+            refName = name;
         }
         
         public void run(){
             while (true){
                 try{
                     lastChat = in.readLine();
-                    chatQ.add(lastChat);
+                    chatQ.add(new Message(refName,lastChat));
                 } catch(Exception e){
                     out.println("\tFrom: HOST, Error in sending message...");
                 }
