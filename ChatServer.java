@@ -6,34 +6,69 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ChatServer{
+public class ChatHost{
     
     private int port;
-    private String myIp;
+    private String myIp, myName;
     private ArrayList<Socket> clients;
-    private ServerSocket server;
-    private Listener listener;
+    private ArrayList<PrintWriter> outs;
+    private ServerSocket host;
+    private Connector connector;
     
-    public ChatServer(int p){
+    public ChatHost(int p){
         port = p;
     }
     
-    public void startListener(){
-        listener = new Listener(server,clients);
+    public void setName(String nn){
+        myName = nn;
     }
     
-    private class Listener extends Thread{
+    public void startConnector(){
+        connector = new Connector(host,clients);
+    }
+    
+    public void broadcast(String message){
+        for (int i=0, i<outs.size(), i++){
+            outs.get(i).println(message);
+        }
+    }
+    
+    private class Connector extends Thread{
         
-        private ServerSocket server;
+        private ServerSocket host;
         private ArrayList<Socket> clients;
         
-        public Listener(ServerSocket s, ArrayList<Socket> c){
-            server = s;
+        public Connector(ServerSocket s, ArrayList<Socket> c){
+            host = s;
             clients = c;
         }
         
         public void run(){
-            clients.add(server.accept());
+            try{
+                Socket cli = host.accept();
+                clients.add(cli);
+                new Handler(host,cli).start();
+            } catch(Exception e){
+                //Do Nothing
+            }
+        }
+    }
+    
+    private class Handler extends Thread{
+        
+        private ServerSocket host;
+        private Socket client;
+        private PrintWriter out;
+        
+        public Handler(Serversocket h, Socket c){
+            host = h;
+            client = c;
+            out = new PrintWriter(c.getOutputStream(), true);
+            outs.add(out);
+        }
+        
+        public void run(){
+            
         }
     }
 }
