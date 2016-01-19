@@ -1,10 +1,9 @@
-
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-public class UserInterface extends JFrame{
+public class UserInterface extends JFrame implements ActionListener {
     
     private JPanel contentPane, userPane;
     private JScrollPane chatScroller;
@@ -12,11 +11,11 @@ public class UserInterface extends JFrame{
     private JTextField chatField;
     private JButton sendButton;
     
-    private ActionHandler actionHandler;
+    private Interpreter interpreter;
     
-    public UserInterface(String title, ActionHandler h){
+    public UserInterface(String title, Interpreter i){
         super(title);
-        actionHandler = h;
+        interpreter = i;
     }
     
     public void build(){
@@ -30,7 +29,7 @@ public class UserInterface extends JFrame{
         chatField = new JTextField();
         sendButton = new JButton(" > ");
         
-        sendButton.addActionListener(h);
+        sendButton.addActionListener(this);
         
         add(userPane);
         add(chatScroller);
@@ -40,4 +39,11 @@ public class UserInterface extends JFrame{
         pack();
     }
     
+    public void actionPerformed(ActionEvent e){
+        if (e.getActionCommand().equals(" > ")){
+            String text = chatField.getText();
+            chatField.setText("");
+            interpreter.add(text);
+        }
+    }
 }
