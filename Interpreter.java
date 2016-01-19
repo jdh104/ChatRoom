@@ -21,7 +21,7 @@ public class Interpreter extends Thread {
         if (!(cmd.substring(0,1).equals("/"))){
             client.sendPlainMessage(cmd);
         } else {
-            client.sendCommand(cmd.substring(1,cmd.length()-1));
+            client.sendCommand(cmd.substring(1,cmd.length()));
         }
     }
     
