@@ -4,7 +4,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-public class UserInterface extends JFrame implements ActionListener {
+public class UserInterface extends JFrame{
     
     private JPanel contentPane, userPane;
     private JScrollPane chatScroller;
@@ -12,8 +12,11 @@ public class UserInterface extends JFrame implements ActionListener {
     private JTextField chatField;
     private JButton sendButton;
     
-    public UserInterface(String title){
+    private ActionHandler actionHandler;
+    
+    public UserInterface(String title, ActionHandler h){
         super(title);
+        actionHandler = h;
     }
     
     public void build(){
@@ -27,7 +30,7 @@ public class UserInterface extends JFrame implements ActionListener {
         chatField = new JTextField();
         sendButton = new JButton(" > ");
         
-        sendButton.addActionListener(this);
+        sendButton.addActionListener(h);
         
         add(userPane);
         add(chatScroller);
@@ -35,10 +38,6 @@ public class UserInterface extends JFrame implements ActionListener {
         add(sendButton);
         
         pack();
-    }
-    
-    public void actionPerformed(ActionEvent e){
-        
     }
     
 }
