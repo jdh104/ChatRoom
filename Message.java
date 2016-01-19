@@ -19,7 +19,7 @@ public class Message{
     }
     
     public String getDestination(){
-        return destip
+        return destip;
     }
     
     public String getSender(){
