@@ -3,7 +3,7 @@
 public class Message{
     private String sender, message, destip;
     
-    public Messsage(s,m){
+    public Messsage(String s,String m){
         sender = s;
         message = m;
     }
