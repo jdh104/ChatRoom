@@ -1,4 +1,5 @@
 
+import java.util.ArrayList;
 
 public class Interpreter extends Thread {
     
@@ -27,7 +28,11 @@ public class Interpreter extends Thread {
     
     public void run(){
         while (client != null){
-            Thread.sleep(10)
+            try{
+                Thread.sleep(10);
+            } catch(Exception e){
+                //REQUIRED BY JAVA
+            }
             if (commands.size() != 0){
                 interpret(commands.get(0));
                 commands.remove(0);
