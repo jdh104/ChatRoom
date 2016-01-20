@@ -9,6 +9,7 @@ public class Command{
     public Command(String s, String c){
         sender = s;
         command = c;
+        args = new ArrayList<String>();
         
         int n = 0;
         for (int i=0; i<command.length()-1; i++){
