@@ -46,8 +46,9 @@ public class ChatRoom extends JFrame implements ActionListener {
         contentPane.add(topPane);
         contentPane.add(bottomPane);
         
+        setMinimumSize(new Dimension(1000,300));
         setPreferredSize(new Dimension(1000,400));
-        setResizable(false);
+        setResizable(true);
         
         pack();
     }
