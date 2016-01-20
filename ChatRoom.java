@@ -31,10 +31,10 @@ public class ChatRoom extends JFrame implements ActionListener {
         
         sendButton.addActionListener(this);
         
-        add(userPane);
-        add(chatScroller);
-        add(chatField);
-        add(sendButton);
+        contentPane.add(userPane);
+        contentPane.add(chatScroller);
+        contentPane.add(chatField);
+        contentPane.add(sendButton);
         
         pack();
     }
