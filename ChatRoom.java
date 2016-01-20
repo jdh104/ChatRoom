@@ -13,9 +13,9 @@ public class ChatRoom extends JFrame implements ActionListener {
     
     private Interpreter interpreter;
     
-    public ChatRoom(String title, Interpreter i){
+    public ChatRoom(String title){
         super(title);
-        interpreter = i;
+        interpreter = new Interpreter();
     }
     
     public void build(){
