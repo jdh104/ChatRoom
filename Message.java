@@ -30,7 +30,7 @@ public class Message{
         return message;
     }
     
-    public void getOutput(){
+    public String getOutput(){
         return (sender + ": " + message);
     }
 }
