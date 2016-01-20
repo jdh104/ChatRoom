@@ -3,7 +3,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-public class UserInterface extends JFrame implements ActionListener {
+public class ChatRoom extends JFrame implements ActionListener {
     
     private JPanel contentPane, userPane;
     private JScrollPane chatScroller;
@@ -13,7 +13,7 @@ public class UserInterface extends JFrame implements ActionListener {
     
     private Interpreter interpreter;
     
-    public UserInterface(String title, Interpreter i){
+    public ChatRoom(String title, Interpreter i){
         super(title);
         interpreter = i;
     }
