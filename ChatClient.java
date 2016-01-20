@@ -10,7 +10,7 @@ public class ChatClient{
     private PrintWriter out;
     private BufferedReader in;
     
-    private UserInterface GUI;
+    private ChatRoom ROOM;
     
     public ChatClient(){
         
@@ -38,8 +38,8 @@ public class ChatClient{
         name = n;
     }
     
-    public void bindGUI(UserInterface gui){
-        GUI = gui;
+    public void bindROOM(ChatRoom room){
+        ROOM = room;
     }
     
     public void sendPlainMessage(String text){
@@ -52,8 +52,8 @@ public class ChatClient{
         if (command.isValid()){
             out.println(command.getOutput());
         } else {
-            gui.println("Command failed because:");
-            gui.println(command.getError());
+            ROOM.println("Command failed because:");
+            ROOM.println(command.getError());
         }
     }
 }
