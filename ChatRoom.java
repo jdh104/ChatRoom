@@ -23,7 +23,7 @@ public class ChatRoom extends JFrame implements ActionListener {
         contentPane.setLayout(new GridLayout(2,3));
         contentPane.setBorder(new EmptyBorder(10,10,10,10));
         
-        userPane = new JPanel;
+        userPane = new JPanel();
         chatRoom = new JTextArea(10,30);
         chatScroller = new JScrollPane(chatRoom);
         chatField = new JTextField();
