@@ -29,4 +29,8 @@ public class Message{
     public String getMessage(){
         return message;
     }
+    
+    public void getOutput(){
+        return (sender + ": " + message);
+    }
 }
