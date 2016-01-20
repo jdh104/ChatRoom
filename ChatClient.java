@@ -38,7 +38,7 @@ public class ChatClient{
         name = n;
     }
     
-    public void bindROOM(ChatRoom room){
+    public void bindRoom(ChatRoom room){
         ROOM = room;
     }
     
