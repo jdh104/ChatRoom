@@ -6,8 +6,9 @@ public class Interpreter extends Thread {
     private ArrayList<String> commands;
     private ChatClient client;
     
-    public Interpreter(){
+    public Interpreter(ChatClient cli){
         commands = new ArrayList<String>();
+        client = cli;
     }
     
     public void add(String newCommand){
@@ -22,20 +23,27 @@ public class Interpreter extends Thread {
         if (!(cmd.substring(0,1).equals("/"))){
             client.sendPlainMessage(cmd);
         } else {
-            client.sendCommand(cmd.substring(1,cmd.length()));
+            client.sendCommand(cmd);
         }
     }
     
     public void run(){
-        while (client != null){
+        while (true){
             try{
                 Thread.sleep(10);
-            } catch(Exception e){
-                //REQUIRED BY JAVA
+            } catch(Exception ex){
+                //REQUIRED
             }
-            if (commands.size() != 0){
-                interpret(commands.get(0));
-                commands.remove(0);
+            while (client != null){
+                try{
+                    Thread.sleep(10);
+                } catch(Exception e){
+                    //REQUIRED
+                }
+                if (commands.size() != 0){
+                    interpret(commands.get(0));
+                    commands.remove(0);
+                }
             }
         }
     }
