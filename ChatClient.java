@@ -1,12 +1,13 @@
 
 import java.net.Socket;
-import java.io.BufferedReader;
 import java.io.PrintWriter;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import javax.swing.JOptionPane;
 
 public class ChatClient{
     
-    private String name;
-    private int host;
+    private String name, host;
     private int port;
     private Socket client;
     private PrintWriter out;
@@ -20,14 +21,26 @@ public class ChatClient{
     
     public ChatClient(String h, int p){
         if (connectTo(h,p)){
-            in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            out = new PrintWriter(client.getOutputStream(),true);
-            host = h;
-            port = p;
+            try{
+                in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                out = new PrintWriter(client.getOutputStream(),true);
+                host = h;
+                port = p;
+                ROOM = new ChatRoom("Testing");
+                ROOM.build();
+                ROOM.attachClient(this);
+                ROOM.setVisible(true);
+            } catch(Exception e) {
+                in = null;
+                out = null;
+                JOptionPane.showMessageDialog(null,"Error establishing input/output with server");
+            }
+        } else {
+            JOptionPane.showMessageDialog(null,"Error connecting");
         }
     }
     
-    public void connectTo(String h, int p){
+    public boolean connectTo(String h, int p){
         try {
             client = new Socket(h,p);
         } catch(Exception e){
