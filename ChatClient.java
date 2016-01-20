@@ -14,9 +14,10 @@ public class ChatClient{
     private BufferedReader in;
     
     private ChatRoom ROOM;
+    private ChatReciever reciever;
     
     public ChatClient(){
-        
+        //DO NOTHING
     }
     
     public ChatClient(String h, int p){
@@ -29,7 +30,11 @@ public class ChatClient{
                 ROOM = new ChatRoom("Testing");
                 ROOM.build();
                 ROOM.attachClient(this);
+                ROOM.startInterpreter();
                 ROOM.setVisible(true);
+                
+                reciever = new ChatReciever(in,ROOM);
+                reciever.start();
             } catch(Exception e) {
                 in = null;
                 out = null;
@@ -71,4 +76,26 @@ public class ChatClient{
             ROOM.println(command.getError());
         }
     }
+    
+    private class ChatReciever extends Thread{
+        
+        private BufferedReader in;
+        private ChatRoom ROOM;
+        
+        public ChatReciever(BufferedReader in, ChatRoom room){
+            this.in = in;
+            ROOM = room;
+        }
+        
+        public void run(){
+            while (true){
+                try{
+                    ROOM.println(in.readLine());
+                } catch(Exception e){
+                    //REQUIRED
+                }
+            }
+        }
+    }
+                
 }
