@@ -7,6 +7,7 @@ public class ChatRoom extends JFrame implements ActionListener {
     
     private JPanel contentPane, userPane, topPane, bottomPane;
     private JScrollPane chatScroller;
+    private JScrollBar hs, vs;
     private JTextArea chatRoom;
     private JTextField chatField;
     private JButton sendButton;
@@ -16,7 +17,6 @@ public class ChatRoom extends JFrame implements ActionListener {
     
     public ChatRoom(String title){
         super(title);
-        interpreter = new Interpreter();
     }
     
     public void build(){
@@ -32,8 +32,11 @@ public class ChatRoom extends JFrame implements ActionListener {
         chatScroller = new JScrollPane(chatRoom);
         chatField = new JTextField(70);
         sendButton = new JButton(">");
+        hs = chatScroller.getHorizontalScrollBar();
+        vs = chatScroller.getVerticalScrollBar();
         
         sendButton.addActionListener(this);
+        chatRoom.setEditable(false);
         
         topPane.add(userPane);
         topPane.add(chatScroller);
@@ -47,23 +50,31 @@ public class ChatRoom extends JFrame implements ActionListener {
         setResizable(false);
         
         pack();
-        
-        interpreter.attachClient(user);
     }
     
     public void attachClient(ChatClient cli){
         user = cli;
     }
     
+    public void startInterpreter(){
+        interpreter = new Interpreter(user);
+        interpreter.start();
+    }
+    
     public void println(String output){
-        chatRoom.append(output);
+        chatRoom.append(output + "\n");
+        vs.setValue(vs.getMaximum());
+        hs.setValue(hs.getMinimum());
     }
     
     public void actionPerformed(ActionEvent e){
         if (e.getActionCommand().equals(">")){
-            String text = chatField.getText();
-            chatField.setText("");
-            interpreter.add(text);
+            if (chatField.getText().length() != 0){
+                String text = chatField.getText();
+                chatField.setText("");
+                interpreter.add(text);
+            }
+            chatField.grabFocus();
         }
     }
 }
