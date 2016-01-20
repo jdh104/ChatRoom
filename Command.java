@@ -1,4 +1,5 @@
 
+import java.util.ArrayList;
 
 public class Command{
     
@@ -9,11 +10,11 @@ public class Command{
         sender = s;
         command = c;
         
-        int s = 0;
+        int n = 0;
         for (int i=0; i<command.length()-1; i++){
             if (command.substring(i,i+1).equals(" ") || (i+1 == command.length())){
-                args.add(command.substring(s,i+1));
-                s = i+1;
+                args.add(command.substring(n,i+1));
+                n = i+1;
             }
         }
     }
