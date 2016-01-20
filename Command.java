@@ -32,4 +32,8 @@ public class Command{
             return "Internal error, blame the programmer I guess";
         }
     }
+    
+    public ArrayList<String> getOutput(){
+        return args;
+    }
 }
