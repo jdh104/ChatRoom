@@ -1,5 +1,7 @@
 
 import java.net.Socket;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
 
 public class ChatClient{
     
@@ -34,7 +36,7 @@ public class ChatClient{
         return true;
     }
     
-    public void setScreenName(n){
+    public void setScreenName(String n){
         name = n;
     }
     
