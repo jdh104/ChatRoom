@@ -18,4 +18,8 @@ public class Controller{
     public void connectToHost(String ip, int port){
         cli = new ChatClient(ip,port);
     }
+    
+    public void setUserName(String name){
+        cli.setScreenName(name);
+    }
 }
