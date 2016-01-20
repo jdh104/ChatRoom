@@ -3,6 +3,7 @@ import java.net.Socket;
 
 public class ChatClient{
     
+    private String name;
     private int host;
     private int port;
     private Socket client;
@@ -31,7 +32,12 @@ public class ChatClient{
         return true;
     }
     
+    public void setScreenName(n){
+        name = n;
+    }
+    
     public void sendPlainMessage(String text){
-        Message message = new Message();
+        Message message = new Message(name,text);
+        out.println(message.getOutput());
     }
 }
