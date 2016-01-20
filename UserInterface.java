@@ -46,7 +46,7 @@ public class UserInterface extends JFrame implements ActionListener {
         contentPane.add(hostPane);
         
         setPreferredSize(new Dimension(600,120));
-        setResizable(false);
+        setResizable(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         
         pack();
