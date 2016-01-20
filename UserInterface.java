@@ -5,45 +5,70 @@ import javax.swing.border.*;
 
 public class UserInterface extends JFrame implements ActionListener {
     
-    JPanel contentPane;
-    JTextField hostPortInput, connectPortInput, connectIpInput;
-    JButton hostButton, connectButton;
+    private JPanel contentPane, hostPane, connectPane;
+    private JTextField hostPortInput, connectPortInput, connectIpInput;
+    private JButton hostButton, connectButton;
+    
+    private Controller controller;
     
     public UserInterface(){
         super();
     }
     
     public void build(){
-        contentPane = ((JFrame) getContentPane());
-        contentPane.setLayout(new GridLayout(2,5));
+        contentPane = ((JPanel) getContentPane());
+        contentPane.setLayout(new FlowLayout());
         contentPane.setBorder(new EmptyBorder(10,10,10,10));
+        
+        hostPane = new JPanel();
+        connectPane = new JPanel();
         
         hostPortInput = new JTextField(5);
         connectPortInput = new JTextField(15);
         connectIpInput = new JTextField(15);
-        hostButton = new JButton(" Host  ");
+        hostButton = new JButton("Host");
         connectButton = new JButton("Connect");
         
         hostButton.addActionListener(this);
         connectButton.addActionListener(this);
         
-        contentPane.add(new JLabel("Port:"));
-        contentPane.add(hostPortInput);
-        contentPane.add(hostButton);
-        contentPane.add(new JLabel("IP:"));
-        contentPane.add(connectIpInput);
-        contentPane.add(new JLabel(" Port:"));
-        contentPane.add(connectPortInput);
-        contentPane.add(connectButton);
+        hostPane.add(new JLabel("Port:"));
+        hostPane.add(hostPortInput);
+        hostPane.add(hostButton);
+        
+        connectPane.add(new JLabel("IP:"));
+        connectPane.add(connectIpInput);
+        connectPane.add(new JLabel("Port:"));
+        connectPane.add(connectPortInput);
+        connectPane.add(connectButton);
+        
+        contentPane.add(connectPane);
+        contentPane.add(hostPane);
+        
+        setPreferredSize(new Dimension(600,120));
+        setResizable(false);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         
         pack();
     }
     
+    public void bindController(Controller c){
+        controller = c;
+    }
+    
     public void actionPerformed(ActionEvent e){
         if (e.getActionCommand().equals("Connect")){
-            MainClass.connectToHost(connectIpInput.getText(),connectPortInput.getText());
-        } else if (e.getActionCommand().equals(" Host  ")){
-            MainClass.setUpChatRoom(hostPortInput.getText());
+            try{
+                controller.connectToHost(connectIpInput.getText(),Integer.parseInt(connectPortInput.getText()));
+            } catch(Exception ex){
+                JOptionPane.showMessageDialog(null,"Invalid port number");
+            }
+        } else if (e.getActionCommand().equals("Host")){
+            try{
+                controller.setUpChatRoom(Integer.parseInt(hostPortInput.getText()));
+            } catch(Exception ex){
+                JOptionPane.showMessageDialog(null,"Invalid port number");
+            }
         }
     }
 }
