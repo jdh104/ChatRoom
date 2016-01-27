@@ -8,7 +8,7 @@ import javax.swing.JOptionPane;
 public class ChatClient{
     
     private String name, host;
-    private int port;
+    private int port, permission;
     private Socket client;
     private PrintWriter out;
     private BufferedReader in;
@@ -21,6 +21,7 @@ public class ChatClient{
     }
     
     public ChatClient(String h, int p){
+        permission=1;
         if (connectTo(h,p)){
             try{
                 in = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -33,7 +34,7 @@ public class ChatClient{
                 ROOM.startInterpreter();
                 ROOM.setVisible(true);
                 
-                reciever = new ChatReciever(in,ROOM);
+                reciever = new ChatReciever(this,in,ROOM);
                 reciever.start();
             } catch(Exception e) {
                 in = null;
@@ -64,33 +65,46 @@ public class ChatClient{
     
     public void sendPlainMessage(String text){
         Message message = new Message(name,text);
-        out.println(message.getOutput());
+        out.println(message.getMessage());
     }
     
     public void sendCommand(String cmd){
         Command command = new Command(name,cmd);
-        if (command.isValid()){
+        if (command.isValid())
             out.println(command.getOutput());
-        } else {
-            ROOM.println("Command failed because:");
-            ROOM.println(command.getError());
-        }
+        else
+            ROOM.println("Error Sending Command:\n\t" + command.getError());
+    }
+    
+    public String getName(){
+        return name;
+    }
+    
+    public int getPermission(){
+        return permission;
+    }
+    
+    public void setPermission(int newPermission){
+        permission = newPermission;
     }
     
     private class ChatReciever extends Thread{
         
         private BufferedReader in;
         private ChatRoom ROOM;
+        private ChatClient client;
         
-        public ChatReciever(BufferedReader in, ChatRoom room){
+        public ChatReciever(ChatClient cli, BufferedReader in, ChatRoom room){
             this.in = in;
             ROOM = room;
+            client = cli;
         }
         
         public void run(){
             while (true){
                 try{
-                    ROOM.println(in.readLine());
+                    String incoming = in.readLine();
+                    ROOM.println(incoming);
                 } catch(Exception e){
                     //REQUIRED
                 }
