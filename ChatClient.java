@@ -131,6 +131,15 @@ public class ChatClient{
                         else if (f.equals("WHI")                    ) bg = Color.BLACK;
                         
                         ROOM.println(incoming.substring(12,incoming.length()),fg,bg,true);
+                        try{
+                            if (incoming.substring(0,35).equals("/colorWHIBLACHAT HAS BEEN LOCKED TO")){
+                                ROOM.setChatBackground(Color.LIGHT_GRAY);
+                            } else if (incoming.substring(0,37).equals("/colorWHIBLACHAT HAS BEEN UNLOCKED BY")){
+                                ROOM.setChatBackground(Color.WHITE);
+                            }
+                        } catch (Exception e){
+                            //LET PROGRAM CONTINUE
+                        }
                     }
                         
                 } catch(Exception e){
