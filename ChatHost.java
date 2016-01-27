@@ -47,8 +47,18 @@ public class ChatHost{
         }
     }
     
+    public void broadcastColor(String message, String fg, String bg){
+        for (int i=0; i<connector.clients.size(); i++){
+            connector.outs.get(i).println("/color" + fg+bg + message);
+        }
+    }
+    
     public void sendMessage(ClientInfo info, String message){
         info.getPrintWriter().println(message);
+    }
+    
+    public void sendColorMessage(ClientInfo info, String message, String fg, String bg){
+        info.getPrintWriter().println("/color" + fg+bg + message);
     }
     
     public void processCommand(ClientInfo senderInfo, String cmd, int i){
@@ -59,13 +69,13 @@ public class ChatHost{
                 if (!clientExists(newName)){
                     String oldName = senderInfo.getName();
                     senderInfo.setName(newName);
-                    broadcast(oldName + "\'s name has been changed to " + newName);
+                    broadcastColor(oldName + "\'s name has been changed to " + newName,"BLU","WHI");
                 } else {
-                    sendMessage(senderInfo,"Could not change name to " + newName);
+                    sendColorMessage(senderInfo,"Could not change name to " + newName,"RED","WHI");
                 }
-            } else {
-                sendMessage(senderInfo,command.getError());
             }
+        } else {
+                sendMessage(senderInfo,command.getError());
         }
     }
     

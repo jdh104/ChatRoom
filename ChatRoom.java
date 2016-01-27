@@ -1,16 +1,31 @@
-import java.awt.*;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Dimension;
 import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.JOptionPane;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JScrollBar;
+import javax.swing.JTextPane;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+import javax.swing.border.EmptyBorder;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 
 public class ChatRoom extends JFrame implements ActionListener {
     
     private JPanel contentPane, userPane, topPane, bottomPane;
     private JScrollPane chatScroller;
     private JScrollBar hs, vs;
-    private JTextArea chatRoom;
+    private JTextPane chatRoom;
     private JTextField chatField;
     private JButton sendButton;
+    private StyledDocument chatRoomDoc;
     
     private ChatClient user;
     private Interpreter interpreter;
@@ -28,8 +43,11 @@ public class ChatRoom extends JFrame implements ActionListener {
         bottomPane = new JPanel();
         
         userPane = new JPanel();
-        chatRoom = new JTextArea(20,80);
+        chatRoom = new JTextPane();
+        chatRoomDoc = chatRoom.getStyledDocument();
         chatScroller = new JScrollPane(chatRoom);
+        chatScroller.setPreferredSize(new Dimension(800,300));
+        chatRoom.setSize(800,300);
         chatField = new JTextField(70);
         sendButton = new JButton(">");
         hs = chatScroller.getHorizontalScrollBar();
@@ -62,14 +80,32 @@ public class ChatRoom extends JFrame implements ActionListener {
         interpreter.start();
     }
     
-    public void println(String output){
-        chatRoom.append(output + "\n");
+    public void println(String output, Color foreground, Color background, boolean bold){
+        append(output + "\n", foreground, background, bold);
         vs.setValue(vs.getMaximum());
         hs.setValue(hs.getMinimum());
     }
     
-    public void print(String output){
-        chatRoom.append(output);
+    public void print(String output, Color foreground, Color background, boolean bold){
+        append(output,foreground,background,bold);
+    }
+    
+    private void append(String msg, Color f, Color b, boolean bold)
+    {
+        StyleContext sc = StyleContext.getDefaultStyleContext();
+        SimpleAttributeSet aset = new SimpleAttributeSet();
+        StyleConstants.setForeground(aset,f);
+        StyleConstants.setBackground(aset,b);
+        StyleConstants.setBold(aset,bold);
+        try{
+            chatRoomDoc.insertString(chatRoomDoc.getLength(), msg, aset);
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null,"Error appending text to room");
+        }
+    }
+    
+    public void setVisible(boolean b){
+        super.setVisible(b);
     }
     
     public void actionPerformed(ActionEvent e){

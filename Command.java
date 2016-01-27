@@ -66,8 +66,8 @@ public class Command{
     public boolean isAllowed(){
         if (clientInfo == null)
             return false;
-        if (getCommand().equals("newname") && clientInfo.getPermission() == 3)
-            return false;
+        if (getCommand().equals("newname"))
+            return (!(clientInfo.getPermission() == 3));
         return (clientInfo.getPermission() == 3);
     }
     
