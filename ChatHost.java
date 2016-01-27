@@ -63,19 +63,47 @@ public class ChatHost{
     
     public void processCommand(ClientInfo senderInfo, String cmd, int i){
         Command command = new Command(senderInfo,cmd.substring(i+7,cmd.length()));
-        if (command.isValid() && command.isAllowed()){
-            if (command.getCommand().equals("newname")){
-                String newName = command.getArgs().get(1);
-                if (!clientExists(newName)){
-                    String oldName = senderInfo.getName();
-                    senderInfo.setName(newName);
-                    broadcastColor(oldName + "\'s name has been changed to " + newName,"BLU","WHI");
-                } else {
-                    sendColorMessage(senderInfo,"Could not change name to " + newName,"RED","WHI");
+        try{
+            if (command.isValid() && command.isAllowed()){
+                if (command.getCommand().equals("newname")){
+                    String newName = command.getArgs().get(1);
+                    if (!clientExists(newName)){
+                        String oldName = senderInfo.getName();
+                        senderInfo.setName(newName);
+                        broadcastColor(oldName + "\'s name has been changed to " + newName,"BLU","WHI");
+                    } else {
+                        sendColorMessage(senderInfo,"Could not change name to " + newName,"RED","WHI");
+                    }
+                } else if (command.getCommand().equals("promote")){
+                    if (command.getArgs().size() < 2){
+                        throw new IndexOutOfBoundsException();
+                    } else if (connector.getClientInfo(command.getArgs().get(1)) == null){
+                        throw new IndexOutOfBoundsException();
+                    } else {
+                        ClientInfo operand = connector.getClientInfo(command.getArgs().get(1));
+                        if (operand.getPermission() == 1){
+                            operand.setPermission(2);
+                        }
+                    }
+                } else if (command.getCommand().equals("demote")){
+                    if (command.getArgs().size() < 2){
+                        throw new IndexOutOfBoundsException();
+                    } else if (connector.getClientInfo(command.getArgs().get(1)) == null){
+                        throw new IndexOutOfBoundsException();
+                    } else {
+                        ClientInfo operand = connector.getClientInfo(command.getArgs().get(1));
+                        if (operand.getPermission() == 2){
+                            operand.setPermission(1);
+                        }
+                    }
                 }
+            } else {
+                    throw new Exception();
             }
-        } else {
-                sendMessage(senderInfo,command.getError());
+        } catch (IndexOutOfBoundsException e){
+            sendColorMessage(senderInfo,"Syntax Error: Missing argument(s)","RED","BLA");
+        } catch (Exception e){
+            sendColorMessage(senderInfo,command.getError(),"RED","BLA");
         }
     }
     
@@ -83,7 +111,7 @@ public class ChatHost{
         ClientInfo info = connector.getClientInfo(client);
         if (!info.equals(null)){
             info.setPermission(newPermission);
-            sendMessage(info,"Your permissions have been changed to " + info.getPermissionString());
+            sendColorMessage(info,"Your permissions have been changed to " + info.getPermissionString(),"GRE","WHI");
         }
     }
     
