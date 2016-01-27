@@ -74,7 +74,7 @@ public class ChatClient{
         if (command.isValid())
             out.println(command.getOutput());
         else
-            ROOM.println("Error Sending Command:\n\t" + command.getError(), Color.RED, Color.BLACK, true);
+            ROOM.println("Error Sending Command:\n" + command.getError(), Color.RED, Color.BLACK, true);
     }
     
     public String getName(){
