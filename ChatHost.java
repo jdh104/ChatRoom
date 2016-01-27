@@ -30,15 +30,18 @@ public class ChatHost{
     }
     
     public void process(ClientInfo info, String incoming){
-        try{
-            for (int i=0; i<incoming.length(); i++){
-                if (incoming.substring(i,i+8).equals(":::CMD=/")){
-                    processCommand(info,incoming,i);
-                    return;
+        if (info.getPermission() > 0){
+            try{
+                for (int i=0; i<incoming.length(); i++){
+                    if (incoming.substring(i,i+8).equals(":::CMD=/")){
+                        processCommand(info,incoming,i);
+                        return;
+                    }
                 }
-            }
-        } catch (Exception e){}   
-        broadcast(info.getName() + ":" + incoming);
+            } catch (Exception e){}   
+            broadcast(info.getName() + ":" + incoming);
+        } else {
+            sendColorMessage(info,"HOST:You are currently muted","RED","WHI");
     }
     
     public void broadcast(String message){
@@ -100,12 +103,27 @@ public class ChatHost{
                                            operand.getPermissionString(), "BLU","WHI");
                         }
                     }
+                } else if (command.getCommand().equals("mute")){
+                    if (command.getArgs().size() < 3){
+                        throw new IndexOutOfBoundsException();
+                    } else if (connector.getClientInfo(command.getArgs().get(1)) == null){
+                        throw new IndexOutOfBoundsException();
+                    } else {
+                        ClientInfo operand = connector.getClientInfo(command.getArgs().get(1));
+                        long time = Long.parseLong(command.getArgs().get(2));
+                        if (operand.getPermission()!=0){
+                            operand.setPermission(0);
+                            new MuteHandler(operand,time);
+                            broadcastColor(operand.getName() + " has been muted for " + time +
+                                           " minutes","GRE","WHI");
+                        }
+                    }
                 }
             } else {
                     throw new Exception();
             }
         } catch (IndexOutOfBoundsException e){
-            sendColorMessage(senderInfo,"Syntax Error: Missing argument(s)","RED","BLA");
+            sendColorMessage(senderInfo,"Syntax Error: Wrong/missing argument(s)","RED","BLA");
         } catch (Exception e){
             sendColorMessage(senderInfo,command.getError(),"RED","BLA");
         }
@@ -197,6 +215,27 @@ public class ChatHost{
                         //REQUIRED
                     }
                 }
+            }
+        }
+    }
+    
+    private class MuteHandler extends Thread{
+        private long time;
+        private boolean unmutable;
+        private ClientInfo client;
+        public MuteHandler(ClientInfo cli, long t){
+            time = t;
+            unmutable = (t==0);
+            client = cli;
+        }
+        public void run(){
+            if (unmutable){
+                try{
+                    Thread.sleep(time*60000);
+                } catch (Exception e){
+                    run();
+                }
+                client.setPermission(1);
             }
         }
     }
