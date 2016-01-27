@@ -1,4 +1,5 @@
 
+import java.awt.Color;
 import java.net.Socket;
 import java.io.PrintWriter;
 import java.io.BufferedReader;
@@ -73,7 +74,7 @@ public class ChatClient{
         if (command.isValid())
             out.println(command.getOutput());
         else
-            ROOM.println("Error Sending Command:\n\t" + command.getError());
+            ROOM.println("Error Sending Command:\n\t" + command.getError(), Color.RED, Color.BLACK, true);
     }
     
     public String getName(){
@@ -104,7 +105,34 @@ public class ChatClient{
             while (true){
                 try{
                     String incoming = in.readLine();
-                    ROOM.println(incoming);
+                    if (incoming.length() < 12 || !incoming.substring(0,6).equals("/color")){
+                        ROOM.println(incoming, Color.BLACK, Color.WHITE, false);
+                    } else {
+                        String f = incoming.substring(6,9).toUpperCase();
+                        String b = incoming.substring(9,12).toUpperCase();
+                        Color fg = Color.BLACK;
+                        Color bg = Color.WHITE;
+                             if (f.equals("RED")) fg = Color.RED;
+                        else if (f.equals("BLU")) fg = Color.BLUE;
+                        else if (f.equals("GRE")) fg = Color.GREEN;
+                        else if (f.equals("MAG")) fg = Color.MAGENTA;
+                        else if (f.equals("YEL")) fg = Color.YELLOW;
+                        else if (f.equals("CYA")) fg = Color.CYAN;
+                        else if (f.equals("GRA")) fg = Color.GRAY;
+                        else if (f.equals("WHI")) fg = Color.WHITE;
+                             if (b.equals("RED") && !f.equals("RED")) bg = Color.RED;
+                        else if (b.equals("BLU") && !f.equals("BLU")) bg = Color.BLUE;
+                        else if (b.equals("GRE") && !f.equals("GRE")) bg = Color.GREEN;
+                        else if (b.equals("MAG") && !f.equals("MAG")) bg = Color.MAGENTA;
+                        else if (b.equals("YEL") && !f.equals("YEL")) bg = Color.YELLOW;
+                        else if (b.equals("CYA") && !f.equals("CYA")) bg = Color.CYAN;
+                        else if (b.equals("GRA") && !f.equals("GRA")) bg = Color.GRAY;
+                        else if (b.equals("WHI") && !f.equals("WHI")) bg = Color.WHITE;
+                        else if (f.equals("WHI")                    ) bg = Color.BLACK;
+                        
+                        ROOM.println(incoming.substring(12,incoming.length()),fg,bg,true);
+                    }
+                        
                 } catch(Exception e){
                     //REQUIRED
                 }
