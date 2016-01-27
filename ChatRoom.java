@@ -108,6 +108,10 @@ public class ChatRoom extends JFrame implements ActionListener {
         super.setVisible(b);
     }
     
+    public void setChatBackground(Color c){
+        chatRoom.setBackground(c);
+    }
+    
     public void actionPerformed(ActionEvent e){
         if (e.getActionCommand().equals(">")){
             if (chatField.getText().length() != 0){
