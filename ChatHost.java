@@ -29,12 +29,16 @@ public class ChatHost{
         }
     }
     
-    public void process(String incoming){
-        if (!(incoming.substring(0,1).equals("/"))){
-            broadcast(incoming);
-        } else {
-            processCommand(incoming);
-        }
+    public void process(ClientInfo info, String incoming){
+        try{
+            for (int i=0; i<incoming.length(); i++){
+                if (incoming.substring(i,i+8).equals(":::CMD=/")){
+                    processCommand(info,incoming,i);
+                    return;
+                }
+            }
+        } catch (Exception e){}   
+        broadcast(info.getName() + ":" + incoming);
     }
     
     public void broadcast(String message){
@@ -43,22 +47,62 @@ public class ChatHost{
         }
     }
     
-    public void processCommand(String cmd){
-        //IMPLEMENT LATER
+    public void sendMessage(ClientInfo info, String message){
+        info.getPrintWriter().println(message);
+    }
+    
+    public void processCommand(ClientInfo senderInfo, String cmd, int i){
+        Command command = new Command(senderInfo,cmd.substring(i+7,cmd.length()));
+        if (command.isValid() && command.isAllowed()){
+            if (command.getCommand().equals("newname")){
+                String newName = command.getArgs().get(1);
+                if (!clientExists(newName)){
+                    String oldName = senderInfo.getName();
+                    senderInfo.setName(newName);
+                    broadcast(oldName + "\'s name has been changed to " + newName);
+                } else {
+                    sendMessage(senderInfo,"Could not change name to " + newName);
+                }
+            } else {
+                sendMessage(senderInfo,command.getError());
+            }
+        }
+    }
+    
+    public void changeClientPermission(String client, int newPermission){
+        ClientInfo info = connector.getClientInfo(client);
+        if (!info.equals(null)){
+            info.setPermission(newPermission);
+            sendMessage(info,"Your permissions have been changed to " + info.getPermissionString());
+        }
+    }
+    
+    public boolean clientExists(String name){
+        return (connector.getClientInfo(name) != null);
     }
     
     private class Connector extends Thread{
         
         public ArrayList<Socket> clients;
         public ArrayList<PrintWriter> outs;
+        public ArrayList<ClientInfo> clientInfo;
         private ServerSocket server;
         private ChatHost HOST;
         
         public Connector(ServerSocket host, ChatHost HOST){
             clients = new ArrayList<Socket>();
             outs = new ArrayList<PrintWriter>();
+            clientInfo = new ArrayList<ClientInfo>();
             server = host;
             this.HOST = HOST;
+        }
+        
+        public ClientInfo getClientInfo(String name){
+            for (ClientInfo i : clientInfo){
+                if (i.getName().equals(name))
+                    return i;
+            }
+            return null;
         }
         
         public void run(){
@@ -66,7 +110,16 @@ public class ChatHost{
                 try{
                     clients.add(server.accept());
                     outs.add(new PrintWriter(clients.get(clients.size()-1).getOutputStream(),true));
-                    new Listener(clients.get(clients.size()-1),HOST).start();
+                    clientInfo.add(new ClientInfo());
+                    if (clients.size() == 1){
+                        clientInfo.get(clients.size()-1).setName("HOST");
+                        clientInfo.get(clients.size()-1).setPermission(3);
+                    } else {
+                        clientInfo.get(clients.size()-1).setName("user" + clients.size());
+                        clientInfo.get(clients.size()-1).setPermission(1);
+                    }
+                    clientInfo.get(clients.size()-1).setPrintWriter(outs.get(clients.size()-1));
+                    new Listener(clients.get(clients.size()-1),clientInfo.get(clients.size()-1),HOST).start();
                 } catch(Exception e){
                     JOptionPane.showMessageDialog(null,"Error recieving client");
                     while (clients.size() > outs.size()){
@@ -81,10 +134,12 @@ public class ChatHost{
             private Socket client;
             private BufferedReader bufferedReader;
             private ChatHost HOST;
+            private ClientInfo clientInfo;
             
-            public Listener(Socket cli, ChatHost HOST){
+            public Listener(Socket cli, ClientInfo info, ChatHost HOST){
                 client = cli;
                 this.HOST = HOST;
+                clientInfo = info;
                 try{
                     bufferedReader = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 } catch(Exception e){
@@ -95,7 +150,7 @@ public class ChatHost{
             public void run(){
                 while (true){
                     try{
-                        HOST.process(bufferedReader.readLine());
+                        HOST.process(clientInfo,bufferedReader.readLine());
                     } catch(Exception e){
                         //REQUIRED
                     }
