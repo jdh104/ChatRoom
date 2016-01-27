@@ -67,8 +67,15 @@ public class Command{
         if (clientInfo == null)
             return false;
         if (getCommand().equals("newname"))
-            return (!(clientInfo.getPermission() == 3));
-        return (clientInfo.getPermission() == 3);
+            return (!(clientInfo.getPermission() == 3 || clientInfo.getPermission() == 0));
+        if (getCommand().equals("promote") || getCommand().equals("demote"))
+            return (clientInfo.getPermission() == 3);
+        if (getCommand().equals("mute") || getCommand().equals("kick") ||
+            getCommand().equals("unmute") || getCommand().equals("lock") ||
+            getCommand().equals("unlock"))
+            return (clientInfo.getPermission() > 1);
+        else
+            return false;
     }
     
     public String getError(){
