@@ -68,6 +68,10 @@ public class ChatRoom extends JFrame implements ActionListener {
         hs.setValue(hs.getMinimum());
     }
     
+    public void print(String output){
+        chatRoom.append(output);
+    }
+    
     public void actionPerformed(ActionEvent e){
         if (e.getActionCommand().equals(">")){
             if (chatField.getText().length() != 0){
