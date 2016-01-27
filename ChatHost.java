@@ -15,6 +15,7 @@ public class ChatHost{
     private Connector connector;
     public ChatHost(int p){
         port = p;
+        chatLock = 1;
         try{
             host = new ServerSocket(p);
         } catch(Exception e){
@@ -29,18 +30,22 @@ public class ChatHost{
     }
     
     public void process(ClientInfo info, String incoming){
-        if (info.getPermission() > 0){
-            try{
-                for (int i=0; i<incoming.length(); i++){
-                    if (incoming.substring(i,i+8).equals(":::CMD=/")){
-                        processCommand(info,incoming,i);
-                        return;
+        if (!isLocked(info)){
+            if (info.getPermission() > 0){
+                try{
+                    for (int i=0; i<incoming.length(); i++){
+                        if (incoming.substring(i,i+8).equals(":::CMD=/")){
+                            processCommand(info,incoming,i);
+                            return;
+                        }
                     }
-                }
-            } catch (Exception e){}   
-            broadcast(info.getName() + ":" + incoming);
+                } catch (Exception e){}   
+                broadcast(info.getName() + ":" + incoming);
+            } else {
+                sendColorMessage(info,"HOST:You are currently muted","RED","WHI");
+            }
         } else {
-            sendColorMessage(info,"HOST:You are currently muted","RED","WHI");
+            sendMessage(info,"Chat is currently locked to you");
         }
     }
     
@@ -137,7 +142,8 @@ public class ChatHost{
                         ClientInfo operand = connector.getClientInfo(command.getArgs().get(1));
                         if (operand.getPermission()==0){
                             operand.setPermission(1);
-                            broadcastColor(operand.getName() + " has been unmuted","GRE","WHI");
+                            broadcastColor(operand.getName() + " has been unmuted by " + senderInfo.getName(),
+                                                                                        "GRE","WHI");
                         }
                     }
                 } else if (command.getCommand().equals("lock")){
@@ -158,6 +164,25 @@ public class ChatHost{
                         broadcastColor("CHAT HAS BEEN UNLOCKED BY " + senderInfo.getName(),
                                                                         "WHI","BLA");
                     }
+                } else if (command.getCommand().equals("kick")){
+                    if (command.getArgs().size() < 2){
+                        throw new IndexOutOfBoundsException();
+                    } else if (!clientExists(command.getArgs().get(1))){
+                        throw new IndexOutOfBoundsException();
+                    } else {
+                        ClientInfo operand = connector.getClientInfo(command.getArgs().get(1));
+                        if (operand.getName() != "HOST"){
+                            int index = connector.clientInfo.indexOf(operand);
+                            broadcastColor(operand.getName() + " has been kicked by " + senderInfo.getName(),"MAG","BLA");
+                            connector.clients.get(index).close();
+                            connector.clients.remove(index);
+                            connector.outs.get(index).close();
+                            connector.outs.remove(index);
+                            connector.clientInfo.remove(index);
+                        } else {
+                            sendColorMessage(senderInfo,"Cannot kick the HOST you peasant","RED","WHI");
+                        }
+                    }
                 }
             } else {
                     throw new Exception();
@@ -169,16 +194,12 @@ public class ChatHost{
         }
     }
     
-    public void changeClientPermission(String client, int newPermission){
-        ClientInfo info = connector.getClientInfo(client);
-        if (!info.equals(null)){
-            info.setPermission(newPermission);
-            sendColorMessage(info,"Your permissions have been changed to " + info.getPermissionString(),"GRE","WHI");
-        }
-    }
-    
     public boolean clientExists(String name){
         return (connector.getClientInfo(name) != null);
+    }
+    
+    public boolean isLocked(ClientInfo asking){
+        return (asking.getPermission() < chatLock);
     }
     
     private class Connector extends Thread{
