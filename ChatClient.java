@@ -1,4 +1,5 @@
 
+import java.awt.Color;
 import java.net.Socket;
 import java.io.PrintWriter;
 import java.io.BufferedReader;
@@ -8,7 +9,7 @@ import javax.swing.JOptionPane;
 public class ChatClient{
     
     private String name, host;
-    private int port;
+    private int port, permission;
     private Socket client;
     private PrintWriter out;
     private BufferedReader in;
@@ -21,6 +22,7 @@ public class ChatClient{
     }
     
     public ChatClient(String h, int p){
+        permission=1;
         if (connectTo(h,p)){
             try{
                 in = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -33,7 +35,7 @@ public class ChatClient{
                 ROOM.startInterpreter();
                 ROOM.setVisible(true);
                 
-                reciever = new ChatReciever(in,ROOM);
+                reciever = new ChatReciever(this,in,ROOM);
                 reciever.start();
             } catch(Exception e) {
                 in = null;
@@ -64,33 +66,82 @@ public class ChatClient{
     
     public void sendPlainMessage(String text){
         Message message = new Message(name,text);
-        out.println(message.getOutput());
+        out.println(message.getMessage());
     }
     
     public void sendCommand(String cmd){
         Command command = new Command(name,cmd);
-        if (command.isValid()){
+        if (command.isValid())
             out.println(command.getOutput());
-        } else {
-            ROOM.println("Command failed because:");
-            ROOM.println(command.getError());
-        }
+        else
+            ROOM.println("Error Sending Command:\n" + command.getError(), Color.RED, Color.BLACK, true);
+    }
+    
+    public String getName(){
+        return name;
+    }
+    
+    public int getPermission(){
+        return permission;
+    }
+    
+    public void setPermission(int newPermission){
+        permission = newPermission;
     }
     
     private class ChatReciever extends Thread{
         
         private BufferedReader in;
         private ChatRoom ROOM;
+        private ChatClient client;
         
-        public ChatReciever(BufferedReader in, ChatRoom room){
+        public ChatReciever(ChatClient cli, BufferedReader in, ChatRoom room){
             this.in = in;
             ROOM = room;
+            client = cli;
         }
         
         public void run(){
             while (true){
                 try{
-                    ROOM.println(in.readLine());
+                    String incoming = in.readLine();
+                    if (incoming.length() < 12 || !incoming.substring(0,6).equals("/color")){
+                        ROOM.println(incoming, Color.BLACK, Color.WHITE, false);
+                    } else {
+                        String f = incoming.substring(6,9).toUpperCase();
+                        String b = incoming.substring(9,12).toUpperCase();
+                        Color fg = Color.BLACK;
+                        Color bg = Color.WHITE;
+                             if (f.equals("RED")) fg = Color.RED;
+                        else if (f.equals("BLU")) fg = Color.BLUE;
+                        else if (f.equals("GRE")) fg = Color.GREEN;
+                        else if (f.equals("MAG")) fg = Color.MAGENTA;
+                        else if (f.equals("YEL")) fg = Color.YELLOW;
+                        else if (f.equals("CYA")) fg = Color.CYAN;
+                        else if (f.equals("GRA")) fg = Color.GRAY;
+                        else if (f.equals("WHI")) fg = Color.WHITE;
+                             if (b.equals("RED") && !f.equals("RED")) bg = Color.RED;
+                        else if (b.equals("BLU") && !f.equals("BLU")) bg = Color.BLUE;
+                        else if (b.equals("GRE") && !f.equals("GRE")) bg = Color.GREEN;
+                        else if (b.equals("MAG") && !f.equals("MAG")) bg = Color.MAGENTA;
+                        else if (b.equals("YEL") && !f.equals("YEL")) bg = Color.YELLOW;
+                        else if (b.equals("CYA") && !f.equals("CYA")) bg = Color.CYAN;
+                        else if (b.equals("GRA") && !f.equals("GRA")) bg = Color.GRAY;
+                        else if (b.equals("WHI") && !f.equals("WHI")) bg = Color.WHITE;
+                        else if (f.equals("WHI")                    ) bg = Color.BLACK;
+                        
+                        ROOM.println(incoming.substring(12,incoming.length()),fg,bg,true);
+                        try{
+                            if (incoming.substring(0,35).equals("/colorWHIBLACHAT HAS BEEN LOCKED TO")){
+                                ROOM.setChatBackground(Color.LIGHT_GRAY);
+                            } else if (incoming.substring(0,37).equals("/colorWHIBLACHAT HAS BEEN UNLOCKED BY")){
+                                ROOM.setChatBackground(Color.WHITE);
+                            }
+                        } catch (Exception e){
+                            //LET PROGRAM CONTINUE
+                        }
+                    }
+                        
                 } catch(Exception e){
                     //REQUIRED
                 }
