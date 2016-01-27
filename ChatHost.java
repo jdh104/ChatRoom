@@ -83,6 +83,8 @@ public class ChatHost{
                         ClientInfo operand = connector.getClientInfo(command.getArgs().get(1));
                         if (operand.getPermission() == 1){
                             operand.setPermission(2);
+                            broadcastColor(operand.getName() + "\'s permission has been changed to " +
+                                           operand.getPermissionString(), "BLU","WHI");
                         }
                     }
                 } else if (command.getCommand().equals("demote")){
@@ -94,6 +96,8 @@ public class ChatHost{
                         ClientInfo operand = connector.getClientInfo(command.getArgs().get(1));
                         if (operand.getPermission() == 2){
                             operand.setPermission(1);
+                            broadcastColor(operand.getName() + "\'s permission has been changed to " +
+                                           operand.getPermissionString(), "BLU","WHI");
                         }
                     }
                 }
