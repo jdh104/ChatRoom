@@ -10,16 +10,15 @@ public class Controller{
         GUI.bindController(this);
         GUI.setVisible(true);
     }
+    
     public void setUpChatRoom(int port){
         host = new ChatHost(port);
         cli = new ChatClient("127.0.0.1",port);
+        cli.setScreenName("HOST");
+        cli.setPermission(3);
     }
     
     public void connectToHost(String ip, int port){
         cli = new ChatClient(ip,port);
-    }
-    
-    public void setUserName(String name){
-        cli.setScreenName(name);
     }
 }
