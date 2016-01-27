@@ -60,14 +60,12 @@ public class UserInterface extends JFrame implements ActionListener {
         if (e.getActionCommand().equals("Connect")){
             try{
                 controller.connectToHost(connectIpInput.getText(),Integer.parseInt(connectPortInput.getText()));
-                controller.setUserName(JOptionPane.showInputDialog("Enter preferred Username:"));
             } catch(Exception ex){
                 JOptionPane.showMessageDialog(null,"Invalid port number");
             }
         } else if (e.getActionCommand().equals("Host")){
             try{
                 controller.setUpChatRoom(Integer.parseInt(hostPortInput.getText()));
-                controller.setUserName(JOptionPane.showInputDialog("Enter preferred Username:"));
             } catch(Exception ex){
                 JOptionPane.showMessageDialog(null,"Invalid port number");
             }
