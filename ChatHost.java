@@ -11,9 +11,8 @@ import javax.swing.JOptionPane;
 public class ChatHost{
     
     private ServerSocket host;
-    private int port;
+    private int port, chatLock;
     private Connector connector;
-    
     public ChatHost(int p){
         port = p;
         try{
@@ -42,6 +41,7 @@ public class ChatHost{
             broadcast(info.getName() + ":" + incoming);
         } else {
             sendColorMessage(info,"HOST:You are currently muted","RED","WHI");
+        }
     }
     
     public void broadcast(String message){
@@ -112,11 +112,51 @@ public class ChatHost{
                         ClientInfo operand = connector.getClientInfo(command.getArgs().get(1));
                         long time = Long.parseLong(command.getArgs().get(2));
                         if (operand.getPermission()!=0){
-                            operand.setPermission(0);
-                            new MuteHandler(operand,time);
-                            broadcastColor(operand.getName() + " has been muted for " + time +
-                                           " minutes","GRE","WHI");
+                            if (senderInfo.getPermission() > operand.getPermission()){
+                                operand.setPermission(0);
+                                if (time == 0){
+                                    operand.setPermission(0);
+                                    broadcastColor(operand.getName() + " has been muted by " + 
+                                                                senderInfo.getName(),"GRE","WHI");
+                                } else {
+                                    new MuteHandler(operand,time).start();
+                                    broadcastColor(operand.getName() + " has been muted for " + time +
+                                               " minutes by " + senderInfo.getName(),"GRE","WHI");
+                                }
+                            } else {
+                                sendColorMessage(senderInfo,"Can only mute users with lower rank","BLU","WHI");
+                            }
                         }
+                    }
+                } else if (command.getCommand().equals("unmute")){
+                    if (command.getArgs().size() < 2){
+                        throw new IndexOutOfBoundsException();
+                    } else if (connector.getClientInfo(command.getArgs().get(1)) == null){
+                        throw new IndexOutOfBoundsException();
+                    } else {
+                        ClientInfo operand = connector.getClientInfo(command.getArgs().get(1));
+                        if (operand.getPermission()==0){
+                            operand.setPermission(1);
+                            broadcastColor(operand.getName() + " has been unmuted","GRE","WHI");
+                        }
+                    }
+                } else if (command.getCommand().equals("lock")){
+                    if (command.getArgs().size() < 2){
+                        throw new IndexOutOfBoundsException();
+                    } else {
+                        chatLock = Integer.parseInt(command.getArgs().get(1));
+                        if (chatLock == 2){
+                            broadcastColor("CHAT HAS BEEN LOCKED TO ADMINS BY " + senderInfo.getName(),
+                                                                                    "WHI","BLA");
+                        } else {
+                            broadcastColor("CHAT HAS BEEN LOCKED TO HOST","WHI","BLA");
+                        }
+                    }
+                } else if (command.getCommand().equals("unlock")){
+                    if (chatLock != 1){
+                        chatLock = 1;
+                        broadcastColor("CHAT HAS BEEN UNLOCKED BY " + senderInfo.getName(),
+                                                                        "WHI","BLA");
                     }
                 }
             } else {
@@ -221,21 +261,24 @@ public class ChatHost{
     
     private class MuteHandler extends Thread{
         private long time;
-        private boolean unmutable;
+        private boolean waiting;
         private ClientInfo client;
+        
         public MuteHandler(ClientInfo cli, long t){
             time = t;
-            unmutable = (t==0);
+            waiting = (t==0);
             client = cli;
         }
         public void run(){
-            if (unmutable){
+            client.setPermission(0);
+            if (!waiting){
                 try{
                     Thread.sleep(time*60000);
                 } catch (Exception e){
                     run();
                 }
                 client.setPermission(1);
+                client.getPrintWriter().println("/colorGREWHIHOST: You have been unmuted");
             }
         }
     }
