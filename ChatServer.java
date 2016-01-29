@@ -15,7 +15,7 @@ public class ChatServer{
         try {
             ChatServer cs = new ChatServer();
         } catch (IOException i){
-            //DONT WORRY BOUT IT
+            main(new String[0]);
         }
     }
     
